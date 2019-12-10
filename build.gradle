@@ -1,0 +1,16 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'application'
+
+mainClassName = 'probability.BreedingGUI'
+sourceSets.main.java.srcDirs = ['src']
+
+jar {
+    baseName = 'pokemon-breeding-assistant'
+    version =  '0.1'
+
+    manifest {
+        attributes 'Main-Class': 'probability.BreedingGUI'
+    }
+}
+
