@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *************************************************************************/
-package probability;
+package com.jordanappler.pokemon;
 
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.BitSet;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -25,6 +26,11 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
+
+import com.jordanappler.pokemon.HatchedPokemonStats.IV;
+import com.jordanappler.pokemon.HatchedPokemonStats.Item;
+import com.jordanappler.util.Rational;
+import com.jordanappler.util.random.ProbabilityTree;
 
 public class BreedingGUI implements ActionListener
 {
@@ -97,10 +103,12 @@ public class BreedingGUI implements ActionListener
         jcbTargetSpDef = new JCheckBox("Special Defense");
         jcbTargetSpeed = new JCheckBox("Speed");
 
-        String[] items = { "None", "Power Weight", "Power Bracer", "Power Belt", "Power Lens", "Power Band",
-                "Power Anklet", "Everstone", "Destiny Knot" };
+        String[] items = { "Power Weight", "Power Bracer", "Power Belt", "Power Lens", "Power Band", "Power Anklet",
+                "Destiny Knot", "Everstone", "None" };
         jcbMomItem = new JComboBox(items);
+        jcbMomItem.setSelectedItem("None");
         jcbDadItem = new JComboBox(items);
+        jcbDadItem.setSelectedItem("None");
 
         jbtnCalculate = new JButton("Calculate");
         jbtnCalculate.addActionListener(this);
@@ -153,19 +161,39 @@ public class BreedingGUI implements ActionListener
     public void actionPerformed(ActionEvent ae)
     {
         jbtnCalculate.setEnabled(false);
-        Pokemon mom = new Pokemon(jcbMomHP.isSelected(), jcbMomAttack.isSelected(), jcbMomDefense.isSelected(),
-                jcbMomSpAtt.isSelected(), jcbMomSpDef.isSelected(), jcbMomSpeed.isSelected(),
-                jcbMomItem.getSelectedIndex());
-        Pokemon dad = new Pokemon(jcbDadHP.isSelected(), jcbDadAttack.isSelected(), jcbDadDefense.isSelected(),
-                jcbDadSpAtt.isSelected(), jcbDadSpDef.isSelected(), jcbDadSpeed.isSelected(),
-                jcbDadItem.getSelectedIndex());
-        Pokemon target = new Pokemon(jcbTargetHP.isSelected(), jcbTargetAttack.isSelected(),
-                jcbTargetDefense.isSelected(), jcbTargetSpAtt.isSelected(), jcbTargetSpDef.isSelected(),
-                jcbTargetSpeed.isSelected());
-        Instance tree = Instance.createTree(mom, dad, target);
-        Rational probability = tree.sumPathChance;
-        jlabFraction.setText(probability.toString());
-        jlabPercent.setText(probability.toPercent() + "%");
+
+        BitSet momIVs = new BitSet(6);
+        momIVs.set(IV.HP.ordinal(), jcbMomHP.isSelected());
+        momIVs.set(IV.ATTACK.ordinal(), jcbMomAttack.isSelected());
+        momIVs.set(IV.DEFENSE.ordinal(), jcbMomDefense.isSelected());
+        momIVs.set(IV.SPECIAL_ATTACK.ordinal(), jcbMomSpAtt.isSelected());
+        momIVs.set(IV.SPECIAL_DEFENSE.ordinal(), jcbMomSpDef.isSelected());
+        momIVs.set(IV.SPEED.ordinal(), jcbMomSpeed.isSelected());
+        Item momItem = HatchedPokemonStats.itemValues[jcbMomItem.getSelectedIndex()];
+
+        BitSet dadIVs = new BitSet(6);
+        dadIVs.set(IV.HP.ordinal(), jcbDadHP.isSelected());
+        dadIVs.set(IV.ATTACK.ordinal(), jcbDadAttack.isSelected());
+        dadIVs.set(IV.DEFENSE.ordinal(), jcbDadDefense.isSelected());
+        dadIVs.set(IV.SPECIAL_ATTACK.ordinal(), jcbDadSpAtt.isSelected());
+        dadIVs.set(IV.SPECIAL_DEFENSE.ordinal(), jcbDadSpDef.isSelected());
+        dadIVs.set(IV.SPEED.ordinal(), jcbDadSpeed.isSelected());
+        Item dadItem = HatchedPokemonStats.itemValues[jcbDadItem.getSelectedIndex()];
+
+        BitSet goal = new BitSet(6);
+        goal.set(IV.HP.ordinal(), jcbTargetHP.isSelected());
+        goal.set(IV.ATTACK.ordinal(), jcbTargetAttack.isSelected());
+        goal.set(IV.DEFENSE.ordinal(), jcbTargetDefense.isSelected());
+        goal.set(IV.SPECIAL_ATTACK.ordinal(), jcbTargetSpAtt.isSelected());
+        goal.set(IV.SPECIAL_DEFENSE.ordinal(), jcbTargetSpDef.isSelected());
+        goal.set(IV.SPEED.ordinal(), jcbTargetSpeed.isSelected());
+
+        ProbabilityTree tree = new ProbabilityTree(
+                new HatchedPokemonStats(momIVs, momItem, dadIVs, dadItem, goal));
+        Rational goalProbability = tree.generate();
+
+        jlabFraction.setText(goalProbability.toString());
+        jlabPercent.setText(goalProbability.toPercent() + "%");
         jbtnCalculate.setEnabled(true);
     }
 

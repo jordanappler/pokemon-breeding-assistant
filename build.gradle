@@ -2,15 +2,15 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'application'
 
-mainClassName = 'probability.BreedingGUI'
+mainClassName = 'com.jordanappler.pokemon.BreedingGUI'
 sourceSets.main.java.srcDirs = ['src']
 
 jar {
     baseName = 'pokemon-breeding-assistant'
-    version =  '0.1'
+    version =  '0.2.0'
 
     manifest {
-        attributes 'Main-Class': 'probability.BreedingGUI'
+        attributes 'Main-Class': 'com.jordanappler.pokemon.BreedingGUI'
     }
 }
 

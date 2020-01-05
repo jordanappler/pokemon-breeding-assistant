@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *************************************************************************/
-package probability;
+package com.jordanappler.util;
 
 import java.text.DecimalFormat;
 
@@ -26,6 +26,19 @@ public class Rational
     {
         this.num = numIn;
         this.den = denIn;
+    }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        if (this == object)
+            return true;
+        if (object == null)
+            return false;
+        if (getClass() != object.getClass())
+            return false;
+        Rational quotient = divide((Rational) object);
+        return (quotient.num == 1 && quotient.den == 1);
     }
 
     public long getNum()
