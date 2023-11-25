@@ -6,8 +6,8 @@ mainClassName = 'com.jordanappler.pokemon.BreedingGUI'
 sourceSets.main.java.srcDirs = ['src']
 
 jar {
-    baseName = 'pokemon-breeding-assistant'
-    version =  '0.2.0'
+    archiveBaseName = 'pokemon-breeding-assistant'
+    archiveVersion =  '0.2.0'
 
     manifest {
         attributes 'Main-Class': 'com.jordanappler.pokemon.BreedingGUI'
